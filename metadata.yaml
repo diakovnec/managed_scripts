@@ -1,5 +1,5 @@
 file: script.sh
-name: restart_dns_pods
+ame: restart_dns_default_pods
 description: Restart dns pods in openshift-dns namespace
 author: Yuri Diakov
 allowedGroups:
@@ -7,46 +7,19 @@ allowedGroups:
   - LPSRE
   - CEE
 rbac:
-  clusterRoleRules:
-    - verbs:
-        - "get"
-        - "patch"
-        - "list"
-        - "watch"
-        - "create"
-        - "delete"
-        apiGroups:
-        - ""
-        resources:
-        - "daemonsets.apps"
-        - "namespaces"
-
- #roles:
-   #- namespace: "openshift-dns"
-    # rules:
-      # - verbs:
-        # - "get"
-        # - "patch"
-        # - "list"
-        # - "watch"
-        # - "create"
-        # - "delete"
-        # apiGroups:
-        # - ""
-        # resources:
-        # - "pods"
-        # - "pods/attach"
-      # - verbs:
-        # - "get"
-        # - "patch"
-        # - "list"
-        # - "watch"
-        # - "create"
-        # - "delete"
-        # apiGroups:
-        # - ""
-        # resources:
-        # - "daemonsets"
+ roles:
+   - namespace: "openshift-dns"
+     rules:
+       - verbs:
+         - "get"
+         - "patch"
+         - "list"
+         - "watch"
+         apiGroups:
+         - "apps"
+         resources:
+         - "daemonsets"
+         - "pods"
 envs:          
   - key: NAMESPACE
     description: The openshift-dns namespace 

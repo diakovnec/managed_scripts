@@ -27,48 +27,64 @@ finish_job(){
 
 
 
-## Function for kubelet restart
+## Function for daemonsent rollout start
 restart_dns_pods(){
 
-    echo "Restarting dns_pods in \"${NAMESPACE}\"..."
+    echo -e "\nRestarting dns_pods in \"${NAMESPACE}\" namespace. Wait until rollout reaches 5 out 5"
     
     oc -n openshift-dns rollout restart ds/dns-default
 
     if [ $? -eq 0 ]; then 
-        echo "[SUCCESS] Pods rollout started in \"${NAMESPACE}\" ."
+        echo -e "\n[SUCCESS] Pods rollout started in \"${NAMESPACE}\" ."
         echo
     else
-        echo "[Error] Pods rollout has failed."
+        echo -e "\n[Error] Pods rollout has failed."
         exit 1
     fi
 
 }
 
 
-## Function for kubelet restart
+## Function for daemonset rollout status
 monitor_dns_pods_restar_progress(){
 
-    echo "Restarting dns_pods in \"${NAMESPACE}\"..."
+    echo -e "\nRestarting dns_pods in \"${NAMESPACE}\"..."
 
     oc -n openshift-dns rollout status ds/dns-default 
 
     if [ $? -eq 0 ]; then
-        echo "[SUCCESS] Pods rollout is completed successfully \"${NAMESPACE}\" ."
-        echo
+        echo -e "\n[SUCCESS] Pods rollout is completed successfully in \"${NAMESPACE}\" namespace.\n"
+       
     else
-        echo "[Error] Pods rollout has failed."
+        echo -e "\n[Error] Pods rollout has failed."
         exit 1
     fi
 
 }
 
+verify_dns_pods_are_ready(){
 
+echo -e "\nWaiting for pods to get into a Running state"
+
+sleep 30
+
+if [[ $(oc wait pods -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default --for=condition=Ready) ]]; then
+        
+        sleep 30	
+	echo -e '\nAll pods are in the Running state\n';
+	oc get pods -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default
+	exit 1
+fi
+
+
+}
 
 
 main(){
     start_job
     restart_dns_pods
     monitor_dns_pods_restar_progress
+    verify_dns_pods_are_ready
     finish_job
 }
 
