@@ -1,5 +1,5 @@
 file: script.sh
-ame: restart_dns_default_pods
+name: restart-dns-default
 description: Restart dns pods in openshift-dns namespace
 author: Yuri Diakov
 allowedGroups:

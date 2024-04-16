@@ -32,15 +32,13 @@ restart_dns_pods(){
 
     echo -e "\nRestarting dns_pods in \"${NAMESPACE}\" namespace. Wait until rollout reaches 5 out 5"
     
-    oc -n openshift-dns rollout restart ds/dns-default
-
-    if [ $? -eq 0 ]; then 
+     if oc -n openshift-dns rollout restart ds/dns-default 
+     then
         echo -e "\n[SUCCESS] Pods rollout started in \"${NAMESPACE}\" ."
-        echo
-    else
+     else
         echo -e "\n[Error] Pods rollout has failed."
         exit 1
-    fi
+     fi
 
 }
 
@@ -50,9 +48,8 @@ monitor_dns_pods_restar_progress(){
 
     echo -e "\nRestarting dns_pods in \"${NAMESPACE}\"..."
 
-    oc -n openshift-dns rollout status ds/dns-default 
-
-    if [ $? -eq 0 ]; then
+    if   oc -n openshift-dns rollout status ds/dns-default 
+    then
         echo -e "\n[SUCCESS] Pods rollout is completed successfully in \"${NAMESPACE}\" namespace.\n"
        
     else
@@ -64,14 +61,14 @@ monitor_dns_pods_restar_progress(){
 
 verify_dns_pods_are_ready(){
 
-echo -e "\nWaiting for pods to get into a Running state"
+echo -e "\nVerifying that pods are in Running state..."
 
 sleep 30
 
 if [[ $(oc wait pods -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default --for=condition=Ready) ]]; then
         
         sleep 30	
-	echo -e '\nAll pods are in the Running state\n';
+	echo -e "\nAll pods are in the Running state\n";
 	oc get pods -n openshift-dns -l dns.operator.openshift.io/daemonset-dns=default
 	exit 1
 fi
